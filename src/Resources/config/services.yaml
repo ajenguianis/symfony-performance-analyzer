@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    AA\PerformanceAnalyzer\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,PerformanceAnalyzerBundle.php}'
+
+    AA\PerformanceAnalyzer\DataCollector\PerformanceDataCollector:
+        tags:
+            - { name: data_collector, template: '@AAPerformanceAnalyzer/collector/performance.html.twig', id: 'aa_performance.collector' }
+
+    AA\PerformanceAnalyzer\Service\CopilotRecommendationService:
+        arguments:
+            $copilotToken: '%env(COPILOT_API_TOKEN)%'

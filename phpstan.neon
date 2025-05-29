@@ -1,0 +1,20 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - src/Resources
+        - src/DependencyInjection
+    symfony:
+        container_xml_path: '%currentWorkingDirectory%/var/cache/dev/srcDevDebugProjectContainer.xml'
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+    ignoreErrors:
+        - '#Unsafe usage of new static\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9_\\]+::[a-zA-Z0-9_]+\(\)#'
+        - '#PHPDoc tag @var for variable [a-zA-Z0-9_$]+ contains unresolvable type.#'
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon

@@ -1,0 +1,17 @@
+/vendor/
+/.phpunit.cache
+/var/
+/composer.lock
+/.idea
+/.vscode
+/.env
+/node_modules/
+/public/bundles/
+/phpunit.xml
+/cache/
+/tests/var/
+/tests/cache/
+/coverage/
+*.swp
+*.swo
+.DS_Store
