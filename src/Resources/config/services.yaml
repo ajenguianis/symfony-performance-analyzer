@@ -2,6 +2,7 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        public: false
 
     AA\PerformanceAnalyzer\:
         resource: '../../*'
@@ -9,6 +10,7 @@ services:
 
     AA\PerformanceAnalyzer\Analyzer\PerformanceAnalyzer:
         arguments:
+            $config: '%aa_performance_analyzer%'
             $analyzers: !tagged_iterator aa_performance_analyzer.analyzer
 
     AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer:
