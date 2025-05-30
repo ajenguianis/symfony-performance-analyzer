@@ -68,7 +68,7 @@ EOT;
                 'json' => [
                     'model' => $this->model ?? 'gpt-4', // Fallback to 'gpt-4' if not set
                     'messages' => [
-                        ['role' => 'system', 'content' => 'You are a performance optimization assistant.'],
+                        ['role' => 'system', 'content' => 'You are a performance optimizer assistant.'],
                         ['role' => 'user', 'content' => $prompt],
                     ],
                 ],
@@ -93,9 +93,9 @@ EOT;
     private function isAiEnabled(): bool
     {
         return $this->aiIntegrationEnabled &&
-               $this->apiKey !== null && $this->apiKey !== '' &&
-               $this->endpoint !== null && $this->endpoint !== '' &&
-               $this->model !== null && $this->model !== '';
+            $this->apiKey !== null && $this->apiKey !== '' &&
+            $this->endpoint !== null && $this->endpoint !== '' &&
+            $this->model !== null && $this->model !== '';
     }
 
     private function prepareDataSummary(array $performanceData, array $codeAnalysisData): string
@@ -109,7 +109,8 @@ EOT;
                 . count($performanceData['database']['n_plus_one_issues']) . " N+1 issues detected.";
         }
         if (isset($performanceData['memory'])) {
-            $summary[] = "Memory: Peak usage {$performanceData['memory']['peak_usage'] / 1024 / 1024}MB.";
+            $peakUsageMb = number_format($performanceData['memory']['peak_usage'] / 1024 / 1024, 2);
+            $summary[] = "Memory: Peak usage {$peakUsageMb}MB.";
         }
 
         // Code analysis data
