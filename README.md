@@ -31,7 +31,13 @@ return [
     AA\PerformanceAnalyzer\PerformanceAnalyzerBundle::class => ['all' => true],
 ];
 ```
+Create and run database migrations:
 
+```bash
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+
+```
 Copy public resources (e.g., Chart.js) to your project:
 
 ```bash
