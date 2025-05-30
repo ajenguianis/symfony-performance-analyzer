@@ -4,15 +4,27 @@ declare(strict_types=1);
 
 namespace AA\PerformanceAnalyzer\Collector;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class CacheCollector
 {
-    public function __construct(private AdapterInterface $cache) {}
+    private array $stats = [];
 
-    public function collect(): array
+    public function __construct(private CacheItemPoolInterface $cache) {}
+
+    public function collect(): void
     {
-        // Placeholder for cache stats (requires custom cache adapter implementation)
-        return ['hits' => 0, 'misses' => 0];
+        $this->stats['hits'] = 0;
+        $this->stats['misses'] = 0;
+    }
+
+    public function getStats(): array
+    {
+        return $this->stats;
+    }
+
+    public function reset(): void
+    {
+        $this->stats = [];
     }
 }

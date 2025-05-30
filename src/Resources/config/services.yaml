@@ -16,6 +16,10 @@ services:
     AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer:
         tags: ['aa_performance_analyzer.analyzer']
 
+    AA\PerformanceAnalyzer\Collector\CacheCollector:
+        arguments:
+            $cache: '@cache.app'
+
     assets.performance_analyzer:
         class: Symfony\Component\Asset\Package
         arguments:
