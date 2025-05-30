@@ -20,7 +20,7 @@ A comprehensive toolkit for monitoring and optimizing Symfony applications, feat
 Install the bundle via Composer:
 
 ```bash
-composer require aa/performance-analyzer
+composer require 2a/performance-analyzer
 ```
 
 Enable the bundle in `config/bundles.php`:
