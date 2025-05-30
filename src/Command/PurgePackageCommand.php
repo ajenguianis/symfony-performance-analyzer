@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use Doctrine\DBAL\Connection;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,10 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 
+#[AsCommand(
+    name: 'performance-analyzer:purge-package',
+    description: 'Remove resources associated with a package'
+)]
 class PurgePackageCommand extends Command
 {
-    protected static $defaultName = 'performance-analyzer:purge-package';
-
     public function __construct(
         private ParameterBagInterface $parameters,
         private Connection $connection
@@ -25,8 +28,7 @@ class PurgePackageCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Remove resources associated with a package')
-            ->addOption('package', null, InputOption::VALUE_REQUIRED, 'The package to purge');
+        $this->addOption('package', null, InputOption::VALUE_REQUIRED, 'The package to purge');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

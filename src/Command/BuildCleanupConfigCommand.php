@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 
+#[AsCommand(
+    name: 'performance-analyzer:build-cleanup-config',
+    description: 'Build cached configuration for package resource purging'
+)]
 class BuildCleanupConfigCommand extends Command
 {
-    protected static $defaultName = 'performance-analyzer:build-cleanup-config';
-
     public function __construct(private ParameterBagInterface $parameters)
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setDescription('Build cached configuration for package resource purging');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

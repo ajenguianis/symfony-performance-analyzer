@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AA\PerformanceAnalyzer\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,10 +13,12 @@ use AA\PerformanceAnalyzer\Analyzer\PerformanceAnalyzer;
 use AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer;
 use AA\PerformanceAnalyzer\Service\ReportGenerator;
 
+#[AsCommand(
+    name: 'analyze:performance',
+    description: 'Analyze application performance and code quality'
+)]
 class AnalyzePerformanceCommand extends Command
 {
-    protected static $defaultName = 'analyze:performance';
-
     public function __construct(
         private PerformanceAnalyzer $performanceAnalyzer,
         private CodeAnalyzer $codeAnalyzer,
@@ -26,7 +29,7 @@ class AnalyzePerformanceCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Analyze application performance and code quality')
+        $this
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Output format (json, csv, html)', 'json')
             ->addOption('code-path', null, InputOption::VALUE_OPTIONAL, 'Path to analyze for code issues', 'src');
     }
