@@ -1,5 +1,5 @@
 {
-    "name": "ajenguianis/symfony-performance-analyzer",
+    "name": "aa/symfony-performance-analyzer",
     "description": "Bundle to monitor and analyze performance of Symfony applications",
     "license": "MIT",
     "type": "symfony-bundle",
