@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 
 #[AsCommand(
-    name: 'performance-analyzer:build-cleanup-config',
+    name: 'aa:performance-analyzer:build-cleanup-config',
     description: 'Build cached configuration for package resource purging'
 )]
 class BuildCleanupConfigCommand extends Command

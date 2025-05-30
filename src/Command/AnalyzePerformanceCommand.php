@@ -14,7 +14,7 @@ use AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer;
 use AA\PerformanceAnalyzer\Service\ReportGenerator;
 
 #[AsCommand(
-    name: 'analyze:performance',
+    name: 'aa:analyze:performance',
     description: 'Analyze application performance and code quality'
 )]
 class AnalyzePerformanceCommand extends Command

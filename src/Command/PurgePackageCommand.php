@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 
 #[AsCommand(
-    name: 'performance-analyzer:purge-package',
+    name: 'aa:performance-analyzer:purge-package',
     description: 'Remove resources associated with a package'
 )]
 class PurgePackageCommand extends Command
