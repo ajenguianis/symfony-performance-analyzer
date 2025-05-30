@@ -2,6 +2,7 @@
     "name": "2a/symfony-performance-analyzer",
     "description": "Bundle to monitor and analyze performance of Symfony applications",
     "license": "MIT",
+    "version": "1.0.3",
     "type": "symfony-bundle",
     "authors": [
       {
@@ -19,6 +20,9 @@
         "Tests\\AA\\PerformanceAnalyzer\\": "tests/"
       }
     },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "keywords": ["symfony", "performance", "analyzer", "n-plus-one", "ai-recommendations", "dashboard"],
     "require": {
       "php": ">=8.3",
       "symfony/framework-bundle": "^7.0",
