@@ -1,0 +1,11 @@
+{
+    "name": "aa-performance-analyzer",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+      "chart.js": "^4.4.9"
+    },
+    "scripts": {
+      "build": "cp node_modules/chart.js/dist/chart.min.js src/Resources/public/chart.js"
+    }
+  }

@@ -22,6 +22,7 @@
     "require": {
       "php": ">=8.3",
       "symfony/framework-bundle": "^7.0",
+      "nikic/php-parser": "^5.0",
       "doctrine/orm": "^3.0",
       "symfony/console": "^7.0",
       "symfony/twig-bundle": "^7.0",
@@ -35,7 +36,21 @@
       "symfony/var-dumper": "^7.0",
       "symfony/profiler-pack": "^1.0"
     },
-    "suggest": {
-      "openai-php/client": "For AI recommendations feature"
+    "scripts": {
+      "post-install-cmd": [
+        "npm install",
+        "npm run build",
+        "php bin/console assets:install --symlink",
+        "php bin/console performance-analyzer:build-cleanup-config"
+      ],
+      "post-update-cmd": [
+        "npm install",
+        "npm run build",
+        "php bin/console assets:install --symlink",
+        "php bin/console performance-analyzer:build-cleanup-config"
+      ],
+      "post-package-uninstall": [
+        "php bin/console performance-analyzer:purge-package --package=$COMPOSER_PACKAGE_NAME"
+      ]
     }
   }

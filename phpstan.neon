@@ -14,7 +14,9 @@ parameters:
         - '#Unsafe usage of new static\(\)#'
         - '#Call to an undefined method [a-zA-Z0-9_\\]+::[a-zA-Z0-9_]+\(\)#'
         - '#PHPDoc tag @var for variable [a-zA-Z0-9_$]+ contains unresolvable type.#'
-
+    cognitiveComplexity:
+            class: 50
+            function: 15
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon

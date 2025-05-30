@@ -5,12 +5,18 @@ services:
 
     AA\PerformanceAnalyzer\:
         resource: '../../*'
-        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,PerformanceAnalyzerBundle.php}'
+        exclude: '../../{DependencyInjection,Entity,Tests}'
 
-    AA\PerformanceAnalyzer\DataCollector\PerformanceDataCollector:
-        tags:
-            - { name: data_collector, template: '@AAPerformanceAnalyzer/collector/performance.html.twig', id: 'aa_performance.collector' }
-
-    AA\PerformanceAnalyzer\Service\CopilotRecommendationService:
+    AA\PerformanceAnalyzer\Analyzer\PerformanceAnalyzer:
         arguments:
-            $copilotToken: '%env(COPILOT_API_TOKEN)%'
+            $analyzers: !tagged_iterator aa_performance_analyzer.analyzer
+
+    AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer:
+        tags: ['aa_performance_analyzer.analyzer']
+
+    assets.performance_analyzer:
+        class: Symfony\Component\Asset\Package
+        arguments:
+            - '@assets.context'
+        tags:
+            - { name: assets.package, package_name: performanceanalyzer }

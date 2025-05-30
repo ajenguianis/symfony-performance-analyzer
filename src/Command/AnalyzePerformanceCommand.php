@@ -9,42 +9,49 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AA\PerformanceAnalyzer\Analyzer\PerformanceAnalyzer;
+use AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer;
 use AA\PerformanceAnalyzer\Service\ReportGenerator;
-use AA\PerformanceAnalyzer\Service\CopilotRecommendationService;
 
 class AnalyzePerformanceCommand extends Command
 {
-    protected static $defaultName = 'aa:analyze:performance';
+    protected static $defaultName = 'analyze:performance';
 
     public function __construct(
         private PerformanceAnalyzer $performanceAnalyzer,
-        private ReportGenerator $reportGenerator,
-        private ?CopilotRecommendationService $copilotService = null
+        private CodeAnalyzer $codeAnalyzer,
+        private ReportGenerator $reportGenerator
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->setDescription('Analyze application performance')
+        $this->setDescription('Analyze application performance and code quality')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Output format (json, csv, html)', 'json')
-            ->addOption('copilot', null, InputOption::VALUE_NONE, 'Get GitHub Copilot recommendations');
+            ->addOption('code-path', null, InputOption::VALUE_OPTIONAL, 'Path to analyze for code issues', 'src');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $data = $this->performanceAnalyzer->analyze();
-        $format = $input->getOption('output');
-        $useCopilot = $input->getOption('copilot');
+        // Performance analysis
+        $performanceData = $this->performanceAnalyzer->analyze();
 
-        $report = $this->reportGenerator->generate($data, $format);
-
-        if ($useCopilot && $this->copilotService) {
-            $recommendations = $this->copilotService->getPerformanceRecommendations($data);
-            $report .= "\n\nCopilot Recommendations:\n" . json_encode($recommendations, JSON_PRETTY_PRINT);
+        // Code analysis
+        $codePath = $input->getOption('code-path');
+        $codeData = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($codePath));
+        foreach ($files as $file) {
+            if ($file->getExtension() === 'php') {
+                $codeData[$file->getPathname()] = $this->codeAnalyzer->analyzeFile($file->getPathname());
+            }
         }
 
+        $data = [
+            'performance' => $performanceData,
+            'code_analysis' => $codeData,
+        ];
+
+        $report = $this->reportGenerator->generate($data, $input->getOption('output'));
         $output->writeln($report);
 
         return Command::SUCCESS;
