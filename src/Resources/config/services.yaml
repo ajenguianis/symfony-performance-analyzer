@@ -23,6 +23,7 @@ services:
     assets.performance_analyzer:
         class: Symfony\Component\Asset\Package
         arguments:
+            - '@assets._version__default'
             - '@assets.context'
         tags:
             - { name: assets.package, package_name: performanceanalyzer }
