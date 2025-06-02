@@ -20,7 +20,7 @@ services:
         tags: ['data_collector']
 
     AA\PerformanceAnalyzer\Service\Analyzer\:
-        resource: '../Service/Analyzer/*'
+        resource: '../../Service/Analyzer/*'
         tags: ['performance.analyzer']
 
     AA\PerformanceAnalyzer\Service\Storage\DatabaseStorage:

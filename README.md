@@ -3,8 +3,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PHP Version](https://img.shields.io/badge/php-%5E8.3-blue.svg)](https://php.net/)
 [![Symfony Version](https://img.shields.io/badge/symfony-%5E7.0-blue.svg)](https://symfony.com/)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://travis-ci.org/2a-aa/symfony-performance-analyzer)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://codecov.io/gh/2a-aa/symfony-performance-analyzer)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://travis-ci.org/2a-2a/symfony-performance-analyzer)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://codecov.io/gh/2a-2a/symfony-performance-analyzer)
 
 A powerful toolkit for monitoring and optimizing Symfony applications, offering real-time performance metrics, N+1 query detection, cognitive complexity analysis, automated reporting, a secure web dashboard, and seamless CI/CD integration.
 
@@ -27,7 +27,7 @@ A powerful toolkit for monitoring and optimizing Symfony applications, offering 
 Install the bundle via Composer:
 
 ```bash
-composer require aa/symfony-performance-analyzer
+composer require 2a/symfony-performance-analyzer
 ```
 
 Enable the bundle in `config/bundles.php`:
@@ -300,7 +300,7 @@ The bundle includes:
 Remove the bundle:
 
 ```bash
-composer remove aa/symfony-performance-analyzer
+composer remove 2a/symfony-performance-analyzer
 ```
 
 Drop database tables (if using database storage):
