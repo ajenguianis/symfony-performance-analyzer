@@ -6,6 +6,7 @@ namespace AA\PerformanceAnalyzer\Service\Storage;
 
 use AA\PerformanceAnalyzer\Model\PerformanceResult;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -16,6 +17,7 @@ final class FileStorage implements StorageInterface
     private array $config;
 
     public function __construct(
+        #[Autowire('%kernel.project_dir%/var/performance')]
         private readonly string $storagePath,
         private readonly Filesystem $filesystem,
         private readonly LoggerInterface $logger,
@@ -131,137 +133,138 @@ final class FileStorage implements StorageInterface
                         'maxQueryCount' => max($routeData['queryCounts'])
                     ];
                 }
-
-                return $stats;
-            } catch (\Exception $e) {
-                $this->logger->error('Failed to retrieve file storage statistics', [
-                    'exception' => $e->getMessage()
-                ]);
-                return [];
             }
-        }
 
-        /**
-         * Retrieves data matching criteria with limit.
-         *
-         * @param array $criteria Filter criteria
-         * @param int $limit Maximum number of records
-         * @return array Array of matching data
-         */
-        private function retrieve(array $criteria = [], int $limit = 100): array
-        {
-            try {
-                $this->ensureDirectoryExists();
-
-                $files = glob($this->storagePath . '/*.json');
-                $results = [];
-
-                foreach ($files as $file) {
-                    $data = json_decode(file_get_contents($file), true);
-                    if ($this->matchesCriteria($data, $criteria)) {
-                        $results[] = $data;
-                    }
-                }
-
-                usort($results, fn($a, $b) => $b['timestamp'] - $a['timestamp']);
-                return array_slice($results, 0, $limit);
-            } catch (\Exception $e) {
-                $this->logger->error('Failed to retrieve file storage data', [
-                    'exception' => $e->getMessage(),
-                    'criteria' => $criteria
-                ]);
-                return [];
-            }
-        }
-
-        /**
-         * Cleans up old data based on retention policy.
-         *
-         * @param \DateTimeInterface $before Cutoff date
-         * @return int Number of deleted files
-         */
-        public function cleanup(\DateTimeInterface $before): int
-        {
-            try {
-                $this->ensureDirectoryExists();
-
-                $files = glob($this->storagePath . '/*.json');
-                $deleted = 0;
-                $beforeTimestamp = $before->getTimestamp();
-
-                foreach ($files as $file) {
-                    $data = json_decode(file_get_contents($file), true);
-                    if (isset($data['timestamp']) && $data['timestamp'] < $beforeTimestamp) {
-                        unlink($file);
-                        $deleted++;
-                    }
-                }
-
-                return $deleted;
-            } catch (\Exception $e) {
-                $this->logger->error('Failed to clean up file storage', [
-                    'exception' => $e->getMessage()
-                ]);
-                return 0;
-            }
-        }
-
-        /**
-         * Enforces retention policies for file storage.
-         */
-        private function enforceRetentionPolicy(): void
-        {
-            try {
-                $retentionDays = $this->config['storage']['retention']['days'] ?? 30;
-                $maxRecords = $this->config['storage']['retention']['max_records'] ?? 10000;
-
-                // Delete old files
-                $cutoff = new \DateTimeImmutable("-{$retentionDays} days");
-                $this->cleanup($cutoff);
-
-                // Limit total files
-                $files = glob($this->storagePath . '/*.json');
-                if (count($files) > $maxRecords) {
-                    usort($files, fn($a, $b) => filemtime($a) - filemtime($b));
-                    $excess = array_slice($files, 0, count($files) - $maxRecords);
-                    foreach ($excess as $file) {
-                        unlink($file);
-                    }
-                }
-            } catch (\Exception $e) {
-                $this->logger->error('Failed to enforce file retention policy', [
-                    'exception' => $e->getMessage()
-                ]);
-            }
-        }
-
-        private function ensureDirectoryExists(): void
-        {
-            if (!$this->filesystem->exists($this->storagePath)) {
-                $this->filesystem->mkdir($this->storagePath, 0755);
-            }
-        }
-
-        private function serializeAnalysisResults(array $results): array
-        {
-            $serialized = [];
-            foreach ($results as $analyzerName => $result) {
-                $serialized[$analyzerName] = [
-                    'issues' => $result->getIssues(),
-                    'suggestions' => $result->getSuggestions(),
-                    'metrics' => $result->getMetrics()
-                ];
-            }
-            return $serialized;
-        }
-
-        private function matchesCriteria(array $data, array $criteria): bool
-        {
-            foreach ($criteria as $key => $value) {
-                if (!isset($data[$key]) || $data[$key] !== $value) {
-                    return false;
-                }
-            }
-            return true;
+            return $stats;
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to retrieve file storage statistics', [
+                'exception' => $e->getMessage()
+            ]);
+            return [];
         }
     }
+
+    /**
+     * Retrieves data matching criteria with limit.
+     *
+     * @param array $criteria Filter criteria
+     * @param int $limit Maximum number of records
+     * @return array Array of matching data
+     */
+    private function retrieve(array $criteria = [], int $limit = 100): array
+    {
+        try {
+            $this->ensureDirectoryExists();
+
+            $files = glob($this->storagePath . '/*.json');
+            $results = [];
+
+            foreach ($files as $file) {
+                $data = json_decode(file_get_contents($file), true);
+                if ($this->matchesCriteria($data, $criteria)) {
+                    $results[] = $data;
+                }
+            }
+
+            usort($results, fn($a, $b) => $b['timestamp'] - $a['timestamp']);
+            return array_slice($results, 0, $limit);
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to retrieve file storage data', [
+                'exception' => $e->getMessage(),
+                'criteria' => $criteria
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Cleans up old data based on retention policy.
+     *
+     * @param \DateTimeInterface $before Cutoff date
+     * @return int Number of deleted files
+     */
+    public function cleanup(\DateTimeInterface $before): int
+    {
+        try {
+            $this->ensureDirectoryExists();
+
+            $files = glob($this->storagePath . '/*.json');
+            $deleted = 0;
+            $beforeTimestamp = $before->getTimestamp();
+
+            foreach ($files as $file) {
+                $data = json_decode(file_get_contents($file), true);
+                if (isset($data['timestamp']) && $data['timestamp'] < $beforeTimestamp) {
+                    unlink($file);
+                    $deleted++;
+                }
+            }
+
+            return $deleted;
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to clean up file storage', [
+                'exception' => $e->getMessage()
+            ]);
+            return 0;
+        }
+    }
+
+    /**
+     * Enforces retention policies for file storage.
+     */
+    private function enforceRetentionPolicy(): void
+    {
+        try {
+            $retentionDays = $this->config['storage']['retention']['days'] ?? 30;
+            $maxRecords = $this->config['storage']['retention']['max_records'] ?? 10000;
+
+            // Delete old files
+            $cutoff = new \DateTimeImmutable("-{$retentionDays} days");
+            $this->cleanup($cutoff);
+
+            // Limit total files
+            $files = glob($this->storagePath . '/*.json');
+            if (count($files) > $maxRecords) {
+                usort($files, fn($a, $b) => filemtime($a) - filemtime($b));
+                $excess = array_slice($files, 0, count($files) - $maxRecords);
+                foreach ($excess as $file) {
+                    unlink($file);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to enforce file retention policy', [
+                'exception' => $e->getMessage()
+            ]);
+        }
+    }
+
+    private function ensureDirectoryExists(): void
+    {
+        if (!$this->filesystem->exists($this->storagePath)) {
+            $this->filesystem->mkdir($this->storagePath, 0755);
+        }
+    }
+
+    private function serializeAnalysisResults(array $results): array
+    {
+        $serialized = [];
+        foreach ($results as $analyzerName => $result) {
+            $serialized[$analyzerName] = [
+                'issues' => $result->getIssues(),
+                'suggestions' => $result->getSuggestions(),
+                'metrics' => $result->getMetrics()
+            ];
+        }
+        return $serialized;
+    }
+
+    private function matchesCriteria(array $data, array $criteria): bool
+    {
+        foreach ($criteria as $key => $value) {
+            if (!isset($data[$key]) || $data[$key] !== $value) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
