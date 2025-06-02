@@ -1,130 +1,59 @@
+{% extends 'base.html.twig' %}
+
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Performance Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f8f8f8;
-            font-weight: bold;
-        }
-        canvas {
-            max-width: 100%;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Performance Dashboard</h1>
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">{{ 'performance_dashboard.title'|trans }}</h1>
         
-        <div class="card">
-            <h2>Performance Metrics</h2>
-            <canvas id="performanceChart" height="100"></canvas>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for stat in stats %}
+                {% component MetricCard with {
+                    title: stat.route,
+                    value: stat.avgResponseTime|round(2),
+                    unit: 'ms',
+                    label: 'avg_response_time'|trans
+                } %}
+                {% endcomponent %}
+                
+                {% component MetricCard with {
+                    title: stat.route,
+                    value: (stat.avgMemoryUsage / 1024 / 1024)|round(2),
+                    unit: 'MB',
+                    label: 'avg_memory_usage'|trans
+                } %}
+                {% endcomponent %}
+                
+                {% component MetricCard with {
+                    title: stat.route,
+                    value: stat.avgQueryCount|round(2),
+                    unit: 'queries',
+                    label: 'avg_query_count'|trans
+                } %}
+                {% endcomponent %}
+            {% endfor %}
         </div>
 
-        <div class="card">
-            <h2>Recent Analyses</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Controller</th>
-                        <th>Response Time (ms)</th>
-                        <th>Query Count</th>
-                        <th>Memory Usage (MB)</th>
-                        <th>N+1 Issues</th>
+        <h2 class="text-xl font-bold mt-8 mb-4">{{ 'recent_logs.title'|trans }}</h2>
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2">{{ 'route'|trans }}</th>
+                    <th class="p-2">{{ 'response_time'|trans }}</th>
+                    <th class="p-2">{{ 'memory_usage'|trans }}</th>
+                    <th class="p-2">{{ 'query_count'|trans }}</th>
+                    <th class="p-2">{{ 'created_at'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr class="{% if log.metadata|has_issues %}bg-red-100{% endif %}">
+                        <td class="p-2">{{ log.route }}</td>
+                        <td class="p-2">{{ log.responseTime }} ms</td>
+                        <td class="p-2">{{ (log.memoryUsage / 1024 / 1024)|round(2) }} MB</td>
+                        <td class="p-2">{{ log.queryCount }}</td>
+                        <td class="p-2">{{ log.createdAt|date('Y-m-d H:i:s') }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for analysis in analyses %}
-                        <tr>
-                            <td>{{ analysis.createdAt|date('Y-m-d H:i:s') }}</td>
-                            <td>{{ analysis.controllerAction }}</td>
-                            <td>{{ analysis.responseTime|number_format(2) }}</td>
-                            <td>{{ analysis.queryCount }}</td>
-                            <td>{{ (analysis.memoryUsage / 1024 / 1024)|number_format(2) }}</td>
-                            <td>{{ analysis.nPlusOneIssues|length }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <script src="{{ asset('bundles/performanceanalyzer/chart.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [{% for analysis in analyses %}'{{ analysis.createdAt|date('H:i') }}',{% endfor %}],
-                    datasets: [
-                        {
-                            label: 'Response Time (ms)',
-                            data: [{% for analysis in analyses %}{{ analysis.responseTime }},{% endfor %}],
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: true
-                        },
-                        {
-                            label: 'Query Count',
-                            data: [{% for analysis in analyses %}{{ analysis.queryCount }},{% endfor %}],
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            fill: true
-                        },
-                        {
-                            label: 'Memory Usage (MB)',
-                            data: [{% for analysis in analyses %}{{ (analysis.memoryUsage / 1024 / 1024)|number_format(2) }},{% endfor %}],
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Value' } }
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
 {% endblock %}

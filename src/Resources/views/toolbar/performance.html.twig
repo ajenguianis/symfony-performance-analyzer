@@ -1,0 +1,27 @@
+{% set icon %}
+    <span class="sf-toolbar-value">{{ collector.data.responseTime|default(0) }} ms</span>
+    <span class="sf-toolbar-label">Perf</span>
+{% endset %}
+
+{% set text %}
+    <div class="sf-toolbar-info-piece">
+        <b>{{ 'response_time'|trans }}</b>
+        <span>{{ collector.data.responseTime|default(0) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>{{ 'memory_usage'|trans }}</b>
+        <span>{{ (collector.data.memoryUsage / 1024 / 1024)|round(2) }} MB</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>{{ 'query_count'|trans }}</b>
+        <span>{{ collector.data.queryCount|default(0) }}</span>
+    </div>
+    {% if collector.data.issues|length > 0 %}
+        <div class="sf-toolbar-info-piece">
+            <b>{{ 'issues_detected.title'|trans }}</b>
+            <span>{{ collector.data.issues|length }}</span>
+        </div>
+    {% endif %}
+{% endset %}
+
+{{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}

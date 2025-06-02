@@ -5,25 +5,45 @@ services:
         public: false
 
     AA\PerformanceAnalyzer\:
-        resource: '../../*'
-        exclude: '../../{DependencyInjection,Entity,Tests}'
+        resource: '../*'
+        exclude: '../{Entity,Model,Tests}'
 
-    AA\PerformanceAnalyzer\Analyzer\PerformanceAnalyzer:
+    AA\PerformanceAnalyzer\Service\PerformanceTracker:
         arguments:
-            $config: '%aa_performance_analyzer%'
-            $analyzers: !tagged_iterator aa_performance_analyzer.analyzer
+            $config: '%symfony_performance_analyzer.config%'
+            $enabled: '%symfony_performance_analyzer.enabled%'
 
-    AA\PerformanceAnalyzer\Analyzer\CodeAnalyzer:
-        tags: ['aa_performance_analyzer.analyzer']
+    AA\PerformanceAnalyzer\Service\Collector\DatabaseQueryCollector:
+        tags: ['performance.collector']
 
-    AA\PerformanceAnalyzer\Collector\CacheCollector:
+    AA\PerformanceAnalyzer\Service\Collector\PerformanceDataCollector:
+        tags: ['data_collector']
+
+    AA\PerformanceAnalyzer\Service\Analyzer\:
+        resource: '../Service/Analyzer/*'
+        tags: ['performance.analyzer']
+
+    AA\PerformanceAnalyzer\Service\Storage\DatabaseStorage:
         arguments:
-            $cache: '@cache.app'
+            $config: '%symfony_performance_analyzer.config%'
 
-    assets.performance_analyzer:
-        class: Symfony\Component\Asset\Package
+    AA\PerformanceAnalyzer\Service\Storage\FileStorage:
         arguments:
-            - '@assets._version__default'
-            - '@assets.context'
+            $config: '%symfony_performance_analyzer.config%'
+
+    AA\PerformanceAnalyzer\Twig\PerformanceExtension:
+        tags: ['twig.extension']
+    
+    AA\PerformanceAnalyzer\Utils\Timer: ~
+
+    AA\PerformanceAnalyzer\Utils\QueryAnalyzer: ~
+
+    AA\PerformanceAnalyzer\Utils\ComplexityCalculator: ~
+
+    AA\PerformanceAnalyzer\EventSubscriber\PerformanceEventListener:
         tags:
-            - { name: assets.package, package_name: performanceanalyzer }
+            - { name: kernel.event_listener, event: AA\PerformanceAnalyzer\Event\PerformanceDataEvent, method: onPerformanceData }
+
+    AA\PerformanceAnalyzer\Service\CircuitBreaker:
+        arguments:
+            $config: '%symfony_performance_analyzer.circuit_breaker%'

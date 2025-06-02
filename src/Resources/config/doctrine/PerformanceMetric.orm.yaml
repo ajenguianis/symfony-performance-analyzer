@@ -1,0 +1,33 @@
+AA\PerformanceAnalyzer\Entity\PerformanceMetric:
+    type: entity
+    table: performance_metric
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 100
+        type:
+            type: string
+            length: 50
+        value:
+            type: float
+        unit:
+            type: string
+            length: 20
+            nullable: true
+        context:
+            type: json
+            nullable: true
+        createdAt:
+            type: datetime_immutable
+    manyToOne:
+        performanceLog:
+            targetEntity: AA\PerformanceAnalyzer\Entity\PerformanceLog
+            joinColumn:
+                name: performance_log_id
+                referencedColumnName: id
+                nullable: false

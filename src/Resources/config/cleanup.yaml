@@ -1,5 +1,0 @@
-tables:
-  - aa_performance_analysis
-files:
-  - public/bundles/performanceanalyzer/chart.js
-  - var/log/ai_recommendations.log

@@ -1,0 +1,40 @@
+AA\PerformanceAnalyzer\Entity\PerformanceLog:
+    type: entity
+    table: performance_log
+    indexes:
+        idx_performance_log_created_at:
+            columns: [created_at]
+        idx_performance_log_route:
+            columns: [route]
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        route:
+            type: string
+            length: 255
+        method:
+            type: string
+            length: 10
+        responseTime:
+            type: integer
+        memoryUsage:
+            type: integer
+        queryCount:
+            type: integer
+        queryTime:
+            type: float
+        cognitiveComplexity:
+            type: integer
+            nullable: true
+        metadata:
+            type: json
+        createdAt:
+            type: datetime_immutable
+        requestId:
+            type: string
+            length: 32
+        statusCode:
+            type: integer

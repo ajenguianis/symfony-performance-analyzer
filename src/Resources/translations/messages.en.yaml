@@ -1,0 +1,17 @@
+performance_dashboard:
+    title: Performance Dashboard
+recent_logs:
+    title: Recent Performance Logs
+statistics:
+    title: Performance Statistics
+issues_detected:
+    title: Issues Detected
+    message: Issues detected in route %route%
+route: Route
+response_time: Response Time
+memory_usage: Memory Usage
+query_count: Query Count
+created_at: Created At
+avg_response_time: Average Response Time
+avg_memory_usage: Average Memory Usage
+avg_query_count: Average Query Count

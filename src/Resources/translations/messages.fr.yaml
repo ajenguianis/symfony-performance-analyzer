@@ -1,0 +1,18 @@
+performance_dashboard:
+    title: Tableau de bord des performances
+recent_logs:
+    title: Journaux de performances récents
+statistics:
+    title: Statistiques de performances
+issues_detected:
+    title: Problèmes détectés
+    message: Problèmes détectés dans la route %route%
+route: Route
+response_time: Temps de réponse
+memory_usage: Utilisation de la mémoire
+query_count: Nombre de requêtes
+created_at: Créé à
+avg_response_time: Temps de réponse moyen
+avg_memory_usage: Utilisation moyenne de la mémoire
+avg_query_count: Nombre moyen de requêtes
+severity: Gravité

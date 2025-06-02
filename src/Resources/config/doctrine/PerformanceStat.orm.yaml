@@ -1,0 +1,28 @@
+AA\PerformanceAnalyzer\Entity\PerformanceStat:
+    type: entity
+    table: performance_stat
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        route:
+            type: string
+            length: 255
+        totalRequests:
+            type: integer
+        avgResponseTime:
+            type: float
+        avgMemoryUsage:
+            type: float
+        avgQueryCount:
+            type: float
+        maxResponseTime:
+            type: integer
+        maxMemoryUsage:
+            type: integer
+        maxQueryCount:
+            type: integer
+        updatedAt:
+            type: datetime_immutable
