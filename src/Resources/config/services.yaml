@@ -5,8 +5,8 @@ services:
         public: false
 
     AA\PerformanceAnalyzer\:
-        resource: '../*'
-        exclude: '../{Entity,Model,Tests}'
+        resource: '../../*'
+        exclude: '../../{Entity,Model,Tests,Resources}'
 
     AA\PerformanceAnalyzer\Service\PerformanceTracker:
         arguments:
@@ -15,9 +15,6 @@ services:
 
     AA\PerformanceAnalyzer\Service\Collector\DatabaseQueryCollector:
         tags: ['performance.collector']
-
-    AA\PerformanceAnalyzer\Service\Collector\PerformanceDataCollector:
-        tags: ['data_collector']
 
     AA\PerformanceAnalyzer\Service\Storage\DatabaseStorage:
         arguments:
@@ -36,7 +33,7 @@ services:
 
     AA\PerformanceAnalyzer\Utils\ComplexityCalculator: ~
 
-    AA\PerformanceAnalyzer\EventSubscriber\PerformanceDataEventListener:
+    AA\PerformanceAnalyzer\EventSubscriber\PerformanceEventListener:
         tags:
             - { name: kernel.event_listener, event: AA\PerformanceAnalyzer\Event\PerformanceDataEvent, method: onPerformanceData }
 
@@ -44,20 +41,26 @@ services:
         arguments:
             $config: '%symfony_performance_analyzer.circuit_breaker%'
 
-    AA\PerformanceAnalyzer\Service\Storage\StorageFactory:
-        arguments:
-            $config: '%symfony_performance_analyzer.config%'
-
     AA\PerformanceAnalyzer\Service\Storage\StorageInterface:
         factory: ['@AA\PerformanceAnalyzer\Service\Storage\StorageFactory', 'getStorage']
 
-# Register Doctrine repositories as services
-    AA\PerformanceAnalyzer\Repository\PerformanceLogRepository:
-        factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
-        arguments:
-            - AA\PerformanceAnalyzer\Entity\PerformanceLog
+    AA\PerformanceAnalyzer\Service\Collector\PerformanceDataCollector:
+        tags: ['data_collector']
 
-    AA\PerformanceAnalyzer\Repository\PerformanceStatRepository:
-        factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
+    AA\PerformanceAnalyzer\Command\AnalyzeQualityCommand:
+        tags: ['console.command']
         arguments:
-            - AA\PerformanceAnalyzer\Entity\PerformanceStat
+            $analyzers: !tagged_iterator performance_analyzer.analyzer
+            $baseUrl: '%env(APP_URL)%'
+
+    AA\PerformanceAnalyzer\Service\Analyzer\MemoryAnalyzer:
+        tags: ['performance_analyzer.analyzer']
+
+    AA\PerformanceAnalyzer\Service\Analyzer\CognitiveComplexityAnalyzer:
+        tags: ['performance_analyzer.analyzer']
+
+    AA\PerformanceAnalyzer\Service\Analyzer\NPlusOneQueryDetector:
+        tags: ['performance_analyzer.analyzer']
+
+    Psr\Container\ContainerInterface:
+        alias: service_container

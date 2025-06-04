@@ -145,17 +145,11 @@ final class PerformanceTracker
         return $result;
     }
 
-    /**
-     * Tracks performance of a CLI command.
-     *
-     * @param string $commandName Name of the command
-     * @param callable $callback Command execution callback
-     * @return mixed Command result
-     */
-    public function trackCommand(string $commandName, callable $callback): mixed
+    public function trackCommand(string $commandName, callable $callback): PerformanceResult
     {
         if (!$this->shouldTrack()) {
-            return $callback();
+            $callback();
+            return new PerformanceResult();
         }
 
         $identifier = 'command_' . $commandName . '_' . uniqid();
@@ -175,8 +169,40 @@ final class PerformanceTracker
                 ->setMethod('CLI')
                 ->setStatusCode(0);
 
+            foreach ($this->collectors as $collector) {
+                $collectorData = $collector->collect($identifier);
+                $performanceResult->addCollectorData($collector::class, $collectorData);
+            }
+
+            $enabledAnalyzers = $this->getConfig()['analyzers'] ?? [];
+            foreach ($this->analyzers as $analyzer) {
+                $analyzerClass = (new \ReflectionClass($analyzer))->getShortName();
+                $analyzerKey = strtolower(preg_replace('/Analyzer$/', '', $analyzerClass));
+                if (!($enabledAnalyzers[$analyzerKey] ?? true)) {
+                    continue;
+                }
+                try {
+                    $request = new Request(); // Mock request for CLI
+                    $response = new Response(); // Mock response for CLI
+                    $analysisResult = $analyzer->analyze($request, $response, $performanceResult);
+                    $performanceResult->addAnalysisResult($analyzer::class, $analysisResult);
+                } catch (\Exception $e) {
+                    $performanceResult->addMetadata('analyzer_error', [
+                        'analyzer' => $analyzer::class,
+                        'message' => $e->getMessage()
+                    ]);
+                }
+            }
+
             if ($responseTime > $this->thresholds['max_response_time_ms']) {
                 $performanceResult->addMetadata('bottleneck', 'Response time exceeds threshold');
+            }
+            if ($memoryUsage / 1024 / 1024 > $this->thresholds['max_memory_mb']) {
+                $performanceResult->addMetadata('bottleneck', 'Memory usage exceeds threshold');
+            }
+            $queries = $performanceResult->getCollectorData('database_queries', []);
+            if (count($queries) > $this->thresholds['max_db_queries']) {
+                $performanceResult->addMetadata('bottleneck', 'Query count exceeds threshold');
             }
 
             try {
@@ -187,7 +213,7 @@ final class PerformanceTracker
                 ]);
             }
 
-            return $result;
+            return $performanceResult;
         } finally {
             $this->timer->reset($identifier);
             unset($this->startTimes[$identifier]);

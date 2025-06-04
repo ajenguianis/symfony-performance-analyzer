@@ -15,3 +15,6 @@ created_at: Created At
 avg_response_time: Average Response Time
 avg_memory_usage: Average Memory Usage
 avg_query_count: Average Query Count
+query_time: Query Time
+cognitive_complexity: Cognitive Complexity
+n_plus_one_detected: N+1 Issues Detected

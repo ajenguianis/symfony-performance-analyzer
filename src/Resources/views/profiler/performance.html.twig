@@ -1,0 +1,75 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {{ include('@SymfonyPerformanceAnalyzer/toolbar/performance.html.twig') }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.issues|length > 0 ? 'label-status-error' : '' }}">
+        <span class="icon">{{ include('@SymfonyPerformanceAnalyzer/toolbar/icon.svg') }}</span>
+        <strong>Performance</strong>
+        <span class="count">{{ collector.issues|length }}</span>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Performance Analysis</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.responseTime }} ms</span>
+            <span class="label">{{ 'response_time'|trans }}</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ (collector.memoryUsage / 1024 / 1024)|round(2) }} MB</span>
+            <span class="label">{{ 'memory_usage'|trans }}</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.queryCount }}</span>
+            <span class="label">{{ 'query_count'|trans }}</span>
+        </div>
+    </div>
+
+    {% if collector.nPlusOnePatterns|length > 0 %}
+        <h3>{{ 'n_plus_one_detected'|trans }}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Query</th>
+                    <th>Occurrences</th>
+                    <th>Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pattern in collector.nPlusOnePatterns %}
+                    <tr>
+                        <td>{{ pattern.patterns.query }}</td>
+                        <td>{{ pattern.patterns.occurrences }}</td>
+                        <td>{{ pattern.patterns.ratio|round(2) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if collector.issues|length > 0 %}
+        <h3>{{ 'issues_detected.title'|trans }}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Severity</th>
+                    <th>Analyzer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in collector.issues %}
+                    <tr>
+                        <td>{{ issue.message }}</td>
+                        <td>{{ issue.severity }}</td>
+                        <td>{{ issue.analyzer }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace AA\PerformanceAnalyzer\Entity;
 
+use AA\PerformanceAnalyzer\Repository\PerformanceStatRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: 'AA\PerformanceAnalyzer\Repository\PerformanceStatRepository')]
+#[ORM\Entity(repositoryClass: PerformanceStatRepository::class)]
 #[ORM\Table(name: 'performance_stat')]
 class PerformanceStat
 {

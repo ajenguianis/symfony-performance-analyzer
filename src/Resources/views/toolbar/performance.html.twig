@@ -1,25 +1,52 @@
 {% set icon %}
-    <span class="sf-toolbar-value">{{ collector.data.responseTime|default(0) }} ms</span>
+    <span class="sf-toolbar-value {{ collector.issues|length > 0 ? 'sf-toolbar-status-red' : 'sf-toolbar-status-green' }}">
+        {{ collector.responseTime }} ms
+    </span>
     <span class="sf-toolbar-label">Perf</span>
 {% endset %}
 
 {% set text %}
     <div class="sf-toolbar-info-piece">
+        <b>{{ 'route'|trans }}</b>
+        <span>{{ collector.route }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
         <b>{{ 'response_time'|trans }}</b>
-        <span>{{ collector.data.responseTime|default(0) }} ms</span>
+        <span>{{ collector.responseTime }} ms (Threshold: {{ collector.thresholds.max_response_time_ms }} ms)</span>
     </div>
     <div class="sf-toolbar-info-piece">
         <b>{{ 'memory_usage'|trans }}</b>
-        <span>{{ (collector.data.memoryUsage / 1024 / 1024)|round(2) }} MB</span>
+        <span>{{ (collector.memoryUsage / 1024 / 1024)|round(2) }} MB (Threshold: {{ collector.thresholds.max_memory_mb }} MB)</span>
     </div>
     <div class="sf-toolbar-info-piece">
         <b>{{ 'query_count'|trans }}</b>
-        <span>{{ collector.data.queryCount|default(0) }}</span>
+        <span>{{ collector.queryCount }} (Threshold: {{ collector.thresholds.max_db_queries }})</span>
     </div>
-    {% if collector.data.issues|length > 0 %}
+    <div class="sf-toolbar-info-piece">
+        <b>{{ 'query_time'|trans }}</b>
+        <span>{{ (collector.queryTime * 1000)|round(2) }} ms</span>
+    </div>
+    {% if collector.cognitiveComplexity is not null %}
+        <div class="sf-toolbar-info-piece">
+            <b>{{ 'cognitive_complexity'|trans }}</b>
+            <span>{{ collector.cognitiveComplexity }} (Threshold: {{ collector.thresholds.max_cognitive_complexity }})</span>
+        </div>
+    {% endif %}
+    {% if collector.nPlusOnePatterns|length > 0 %}
+        <div class="sf-toolbar-info-piece">
+            <b>{{ 'n_plus_one_detected'|trans }}</b>
+            <span>{{ collector.nPlusOnePatterns|length }} pattern(s)</span>
+        </div>
+    {% endif %}
+    {% if collector.issues|length > 0 %}
         <div class="sf-toolbar-info-piece">
             <b>{{ 'issues_detected.title'|trans }}</b>
-            <span>{{ collector.data.issues|length }}</span>
+            <span>{{ collector.issues|length }} issue(s)</span>
+            <ul>
+                {% for issue in collector.issues %}
+                    <li>{{ issue.message }} (Severity: {{ issue.severity }})</li>
+                {% endfor %}
+            </ul>
         </div>
     {% endif %}
 {% endset %}

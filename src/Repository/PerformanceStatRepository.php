@@ -8,7 +8,10 @@ use AA\PerformanceAnalyzer\Entity\PerformanceStat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-final class PerformanceStatRepository extends ServiceEntityRepository
+/**
+ * @extends ServiceEntityRepository<PerformanceStat>
+ */
+class PerformanceStatRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

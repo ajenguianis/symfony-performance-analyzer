@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'performance:generate-ci-badge',
+    name: 'aa:performance:generate-ci-badge',
     description: 'Generate a CI/CD badge based on performance metrics'
 )]
 final class GenerateCiBadgeCommand extends Command

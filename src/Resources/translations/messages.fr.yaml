@@ -16,3 +16,6 @@ avg_response_time: Temps de réponse moyen
 avg_memory_usage: Utilisation moyenne de la mémoire
 avg_query_count: Nombre moyen de requêtes
 severity: Gravité
+query_time: Temps des requêtes
+cognitive_complexity: Complexité cognitive
+n_plus_one_detected: Problèmes N+1 détectés

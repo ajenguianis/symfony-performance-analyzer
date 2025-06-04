@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AA\PerformanceAnalyzer\Command;
 
 use AA\PerformanceAnalyzer\Service\Formatter\HtmlReportFormatter;
+use AA\PerformanceAnalyzer\Service\Storage\DatabaseStorage;
 use AA\PerformanceAnalyzer\Service\Storage\StorageInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -14,13 +15,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'performance:generate-report',
+    name: 'aa:performance:generate-report',
     description: 'Generate a performance report for the application'
 )]
 final class GenerateReportCommand extends Command
 {
     public function __construct(
-        private readonly StorageInterface $storage,
+        private readonly DatabaseStorage $storage,
         private readonly HtmlReportFormatter $reportFormatter
     ) {
         parent::__construct();
@@ -38,7 +39,6 @@ final class GenerateReportCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
         $route = $input->getOption('route');
         $limit = (int) $input->getOption('limit');
         $outputFile = $input->getOption('output');

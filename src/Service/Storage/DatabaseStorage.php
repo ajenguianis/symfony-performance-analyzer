@@ -19,15 +19,17 @@ use Psr\Log\LoggerInterface;
 final class DatabaseStorage implements StorageInterface
 {
     private array $config;
+    private PerformanceLogRepository $performanceLogRepository;
+    private PerformanceStatRepository $performanceStatRepository;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly PerformanceLogRepository $logRepository,
-        private readonly PerformanceStatRepository $statRepository,
         private readonly LoggerInterface $logger,
         array $config = []
     ) {
         $this->config = $config;
+        $this->performanceLogRepository = $entityManager->getRepository(PerformanceLog::class);
+        $this->performanceStatRepository = $entityManager->getRepository(PerformanceStat::class);
     }
 
     /**
@@ -90,7 +92,7 @@ final class DatabaseStorage implements StorageInterface
     public function findByRoute(string $route, int $limit = 100): array
     {
         try {
-            return $this->logRepository->findByRoute($route, $limit);
+            return $this->performanceLogRepository->findByRoute($route, $limit);
         } catch (DBALException $e) {
             $this->logger->error('Failed to retrieve logs by route', [
                 'route' => $route,
@@ -109,7 +111,7 @@ final class DatabaseStorage implements StorageInterface
     public function findRecent(int $limit = 100): array
     {
         try {
-            return $this->logRepository->findRecent($limit);
+            return $this->performanceLogRepository->findRecent($limit);
         } catch (DBALException $e) {
             $this->logger->error('Failed to retrieve recent logs', [
                 'exception' => $e->getMessage()
@@ -126,7 +128,7 @@ final class DatabaseStorage implements StorageInterface
     public function getStatistics(): array
     {
         try {
-            return $this->statRepository->getGlobalStatistics();
+            return $this->performanceStatRepository->getGlobalStatistics();
         } catch (DBALException $e) {
             $this->logger->error('Failed to retrieve statistics', [
                 'exception' => $e->getMessage()
@@ -143,7 +145,7 @@ final class DatabaseStorage implements StorageInterface
     private function updateStatistics(PerformanceResult $result): void
     {
         try {
-            $stat = $this->statRepository->findByRoute($result->getRoute());
+            $stat = $this->performanceStatRepository->findByRoute($result->getRoute());
 
             if (!$stat) {
                 $stat = new PerformanceStat();
@@ -188,7 +190,7 @@ final class DatabaseStorage implements StorageInterface
 
             // Delete old records
             $cutoffDate = new \DateTimeImmutable("-{$retentionDays} days");
-            $qb = $this->logRepository->createQueryBuilder('p');
+            $qb = $this->performanceLogRepository->createQueryBuilder('p');
             $qb->delete()
                 ->where('p.createdAt < :cutoff')
                 ->setParameter('cutoff', $cutoffDate)
@@ -196,14 +198,14 @@ final class DatabaseStorage implements StorageInterface
                 ->execute();
 
             // Limit total records
-            $count = $this->logRepository->createQueryBuilder('p')
+            $count = $this->performanceLogRepository->createQueryBuilder('p')
                 ->select('COUNT(p.id)')
                 ->getQuery()
                 ->getSingleScalarResult();
 
             if ($count > $maxRecords) {
                 $excess = $count - $maxRecords;
-                $qb = $this->logRepository->createQueryBuilder('p');
+                $qb = $this->performanceLogRepository->createQueryBuilder('p');
                 $qb->delete()
                     ->orderBy('p.createdAt', 'ASC')
                     ->setMaxResults($excess)

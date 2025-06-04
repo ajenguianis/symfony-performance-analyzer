@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ 'performance_analyzer.title'|trans|default('Performance Analyzer') }}{% endblock %}</title>
+    {# Include Tailwind CSS via CDN for package isolation #}
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block stylesheets %}
+
+    {% endblock %}
+</head>
+<body class="bg-gray-100">
+    {% block body %}
+
+    {% endblock %}
+
+    {% block javascripts %}
+ 
+    {% endblock %}
+</body>
+</html>

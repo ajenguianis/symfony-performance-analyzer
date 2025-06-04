@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace AA\PerformanceAnalyzer\Entity;
 
+use AA\PerformanceAnalyzer\Repository\PerformanceLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: 'AA\PerformanceAnalyzer\Repository\PerformanceLogRepository')]
+#[ORM\Entity(repositoryClass: PerformanceLogRepository::class)]
 #[ORM\Table(name: 'performance_log')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_performance_log_created_at')]
 #[ORM\Index(columns: ['route'], name: 'idx_performance_log_route')]
